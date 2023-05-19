@@ -116,18 +116,17 @@ async function connect() {
               </a>
             </div>
           </div>
-          <div class="navbar-item">
-            <div class="buttons">
-              <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.4-rc.1/web3.min.js"></script>
-              <a href="onclick="connect();" class="button is-blurple">
-                <input type="button" onclick="connect();">
-                <strong
-                  ><i class="fa-solid fa-right-to-bracket mr-2"></i>
-                  Wallet Connect</strong
-                >
-              </a>
-            </div>
-          </div>
+          <head>
+            <title>Connect to crypto wallet</title>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.4-rc.1/web3.min.js"></script>
+         </head>
+      <body>
+         ...
+         ...
+         <input type="button" value="Connect Wallet" onclick="connect();">
+         ...
+         ...
+      </body>
         </div>
       </div>
     </nav>
