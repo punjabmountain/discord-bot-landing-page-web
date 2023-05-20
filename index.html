@@ -1,496 +1,76 @@
-<!--
-  | Website designed by JstnLT (https://jstnlt.my.id)
-  | This project is open source: https://github.com/JastinXyz/discord-bot-landing-page-web
--->
-
 <!DOCTYPE html>
+<html>
 <head>
-  <title>Connect to crypto wallet</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.4-rc.1/web3.min.js"></script>
+  <title>Web3 WalletConnect UI</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.5.3/dist/web3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.6.7/dist/web3-provider.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/walletconnect@1.5.2/dist/walletconnect.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethereumjs-util@^5.2.0/dist/ethereumjs-util.min.js"></script>
 </head>
 <body>
-<script>
-/* To connect using MetaMask */
-async function connect() {
-if (window.ethereum) {
- await window.ethereum.request({ method: "eth_requestAccounts" });
- window.web3 = new Web3(window.ethereum);
- const account = web3.eth.accounts;
- //Get the current MetaMask selected/active wallet
- const walletAddress = account.givenProvider.selectedAddress;
- console.log(`Wallet: ${walletAddress}`);
+  <h1>Web3 WalletConnect UI</h1>
+  <button id="connectButton">Connect Wallet</button>
+  <div id="status"></div>
 
-} else {
-console.log("No wallet");
-}
-}
-</script>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>People.ai - KYC Service</title>
-    <link rel="stylesheet" href="assets/css/bulma.min.css" />
-    <link rel="stylesheet" href="assets/css/style.css" />
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/tippy.js@6/animations/scale.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
-      integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
+  <script>
+    // Initialize Web3 instance
+    let web3;
 
-    <script src="assets/js/jquery-3.6.0.js"></script>
-  </head>
-  <body>
-    <!-- Back To Top Start -->
-    <a id="backtotop" data-tippy-content="Back To Top.">
-      <i class="fa-solid fa-angle-up has-text-white fa-2xl mt-5"></i>
-    </a>
-    <!-- Back To Top End -->
+    async function initWeb3() {
+      // Check if Web3 is already injected by the browser
+      if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+      } else {
+        // Create a new Web3 instance using WalletConnect
+        const provider = new WalletConnectProvider.default({
+          infuraId: 'YOUR_INFURA_PROJECT_ID', // Replace with your Infura Project ID
+        });
+        web3 = new Web3(provider);
+        await provider.enable();
+      }
 
-    <!-- Navbar Start -->
-    <nav
-      class="navbar is-fixed-top"
-      role="navigation"
-      aria-label="main navigation"
-    >
-      <div class="navbar-brand mt-2 mb-2">
-        <a class="navbar-item" href="#">
-          <strong><i class="fa-solid fa-person-shelter"></i>  People.ai</strong>
+      // Check if the current user is connected to a wallet
+      if (web3 && web3.currentProvider) {
+        // Display the connected wallet address
+        const accounts = await web3.eth.getAccounts();
+        const address = accounts[0];
+        document.getElementById('status').innerHTML = 'Connected with address: ' + address;
+      } else {
+        document.getElementById('status').innerHTML = 'Not connected to a wallet';
+      }
+    }
 
-          <!-- or if you want to use image -->
-          <!-- <img
-            src="image link or path"
-            width="112"
-            height="28"
-          /> -->
-        </a>
+    // Connect wallet button click handler
+    document.getElementById('connectButton').addEventListener('click', initWeb3);
 
-        <a
-          role="button"
-          class="navbar-burger has-text-white"
-          data-target="navMenu"
-          aria-label="menu"
-          aria-expanded="false"
-        >
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-        </a>
-      </div>
+    // Smart contract interaction
+    async function interactWithContract() {
+      const contractAddress = 'YOUR_CONTRACT_ADDRESS'; // Replace with your contract address
+      const contractABI = [
+        // Replace with your contract ABI
+        // Example ABI:
+        // {
+        //   "constant": false,
+        //   "inputs": [
+        //     {
+        //       "name": "param1",
+        //       "type": "uint256"
+        //     }
+        //   ],
+        //   "name": "yourContractFunction",
+        //   "outputs": [],
+        //   "payable": false,
+        //   "stateMutability": "nonpayable",
+        //   "type": "function"
+        // }
+      ];
+      const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-      <div id="navbarBasicExample" class="navbar-menu">
-        <div class="navbar-start">
-          <a href="#" class="navbar-item is-tab">
-            Home
-          </a>
+      // Example: Call a contract function
+      const result = await contract.methods.yourContractFunction(123).send({ from: web3.eth.defaultAccount });
 
-          <a href="#service" class="navbar-item is-tab">
-            Service
-          </a>
-
-          <a href="#payments" class="navbar-item is-tab">
-            Pricing
-          </a>
-
-          <a href="#Projects" class="navbar-item is-tab">
-            Projects
-          </a>
-        </div>
-
-        <div class="navbar-end">
-          <a href="#" class="navbar-item is-tab" target="_blank">
-            <i class="fa-brands fa-twitter"></i>
-          </a>
-
-          <a href="#" class="navbar-item is-tab" target="_blank">
-            <i class="fa-brands fa-telegram"></i>
-          </a>
-
-          <div class="navbar-item">
-            <div class="buttons">
-              <a href="mailto:punjabmountain@gmail.com" class="button is-blurple">
-                <strong
-                  ><i class="fa-solid fa-right-to-bracket mr-2"></i>
-                  KYC Registration</strong
-                >
-              </a>
-            </div>
-          </div>
-          <div class="navbar-item">
-            <div class="buttons">
-              <title>Connect to crypto wallet</title>
-              <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.4-rc.1/web3.min.js"></script>
-              <input type="button" value="Connect Wallet" onclick="connect();" class="button is-blurple" i class="fa-solid fa-right-to-bracket mr-2">
-            </div>
-          </div>
-          
-        </div>
-      </div>
-    </nav>
-    <!-- Navbar End -->
-
-    <!-- Hero Section Start -->
-    <section class="hero bg-base is-fullheight">
-      <div class="hero-body">
-        <div class="">
-          <div class="columns">
-            <div class="column mr-6 mt-12" data-aos="fade-up">
-              <p class="title has-text-white has-text-weight-bold">
-                Put your clients at ease, With our quick and easy KYC service.
-              </p>
-              <p class="subtitle has-text-grey-light is-size-6 mt-3">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              </p>
-              <div class="buttons">
-                <a href="#" class="button is-info">
-                  <strong>Join Today</strong>
-                </a>
-
-                <a href="#" class="button is-primary is-outlined">
-                  <strong><i class="fa-solid fa-comment"></i> Telegram Updates</strong>
-                </a>
-              </div>
-            </div>
-            <div class="column mt-6" data-aos="fade-left">
-              <img
-                class="image has-image-centered vert-move mt-4"
-                src="assets/img/relaunch_day.svg"
-                alt="hero image"
-                style="width: 20rem;"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="has-text-centered" data-tippy-content="Scroll Down">
-        <a href="#features"
-          ><i
-            class="fa-solid fa-circle-chevron-down fa-lg vert-move2 has-text-white"
-          ></i
-        ></a>
-      </div>
-    </section>
-    <!-- Hero Section End -->
-
-    <!-- Hero Waves Start -->
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-      <path
-        fill="#1a2634"
-        fill-opacity="1"
-        d="M0,288L24,261.3C48,235,96,181,144,154.7C192,128,240,128,288,149.3C336,171,384,213,432,202.7C480,192,528,128,576,133.3C624,139,672,213,720,213.3C768,213,816,139,864,101.3C912,64,960,64,1008,106.7C1056,149,1104,235,1152,240C1200,245,1248,171,1296,144C1344,117,1392,139,1416,149.3L1440,160L1440,0L1416,0C1392,0,1344,0,1296,0C1248,0,1200,0,1152,0C1104,0,1056,0,1008,0C960,0,912,0,864,0C816,0,768,0,720,0C672,0,624,0,576,0C528,0,480,0,432,0C384,0,336,0,288,0C240,0,192,0,144,0C96,0,48,0,24,0L0,0Z"
-      ></path>
-    </svg>
-    <!-- Hero Waves End -->
-
-    <!-- service Section Start -->
-    <section id="service" class="section mt-6">
-      <div class="has-text-centered">
-        <h1 class="title lined">Our Services</h1>
-        <div class="mb-4"></div>
-        <div class="line line-center blurple"></div>
-      </div>
-
-      <!-- single feature start (Left) -->
-      <div class="single-feature">
-        <div class="shape-right" data-aos="fade-up-left">
-          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <path
-              fill="#9AAAE3"
-              d="M42.7,-62.9C50.9,-52.8,50.1,-34.4,51.7,-19.2C53.4,-4,57.4,8,56.6,20.8C55.8,33.7,50.1,47.4,39.9,53.8C29.6,60.1,14.8,59.1,0.4,58.5C-14,58,-28,57.9,-38,51.5C-48.1,45,-54.3,32.3,-61.3,18.1C-68.4,4,-76.4,-11.7,-71.9,-22.7C-67.4,-33.6,-50.4,-39.8,-36.3,-47.9C-22.2,-56.1,-11.1,-66.3,3.1,-70.5C17.2,-74.7,34.5,-72.9,42.7,-62.9Z"
-              transform="translate(100 100)"
-            />
-          </svg>
-        </div>
-
-        <div class="columns mt-6">
-          <div class="column mr-6">
-            <h4 class="title">Benifits of KYC <span class="blurple"> - </span></h4>
-            <p class="subtitle mt-3">
-              Put your investors minds at ease, by verifying yourself within our KYC
-              database. Securing your personal details prevents projects from 
-              performing illicit activities like money laundering, rug pulls, and other
-              kinds of scams within the blockchain systems. Being transparent to your investors
-              gain their trust for the project and owners.
-            </p>
-          </div>
-          <div class="column" data-aos="fade-left">
-            <img
-              class="image has-image-centered"
-              src="assets/img/features_overview.svg"
-              alt="feature1 img"
-              style="width: 20rem;"
-            />
-          </div>
-        </div>
-      </div>
-      <!-- single feature end (Left) -->
-
-      <!-- single feature start (Right) -->
-      <div class="single-feature">
-        <div class="shape-left" data-aos="fade-up-right">
-          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <path
-              fill="#9AAAE3"
-              d="M54.2,-67.2C69.4,-63.5,80.4,-46.6,84.6,-28.7C88.7,-10.8,86,8.1,76.8,21.4C67.6,34.7,51.9,42.3,38.1,50.3C24.2,58.3,12.1,66.7,-2.8,70.5C-17.7,74.3,-35.3,73.6,-45.6,64.5C-55.9,55.3,-58.8,37.7,-63.3,21.2C-67.7,4.7,-73.7,-10.6,-71.8,-25.4C-69.8,-40.2,-59.9,-54.5,-46.6,-58.9C-33.3,-63.2,-16.7,-57.6,1.4,-59.6C19.5,-61.5,39,-71,54.2,-67.2Z"
-              transform="translate(100 100)"
-            />
-          </svg>
-        </div>
-
-        <div class="columns mt-6">
-          <div class="column" data-aos="fade-right">
-            <img
-              class="image has-image-centered"
-              src="assets/img/product_literation.svg"
-              alt="feature1 img"
-              style="width: 20rem;"
-            />
-          </div>
-          <div class="column">
-            <h4 class="title">
-              Data Protection <span class="has-text-primary"> - </span>
-            </h4>
-            <p class="subtitle mt-3">
-              Within People.ai, we meet high security standards to secure your personal data.
-              We meet GDPR, CCPA requirements and also store PII securely within our system.
-              This means you don't have to worry about potentional breaches of your personal data.
-              
-            </p>
-          </div>
-        </div>
-      </div>
-      <!-- single feature end (Right) -->
-
-      <!-- single feature start (Left) -->
-      <div class="single-feature">
-        <div class="shape-right" data-aos="fade-up-left">
-          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <path
-              fill="#9AAAE3"
-              d="M42.7,-62.9C50.9,-52.8,50.1,-34.4,51.7,-19.2C53.4,-4,57.4,8,56.6,20.8C55.8,33.7,50.1,47.4,39.9,53.8C29.6,60.1,14.8,59.1,0.4,58.5C-14,58,-28,57.9,-38,51.5C-48.1,45,-54.3,32.3,-61.3,18.1C-68.4,4,-76.4,-11.7,-71.9,-22.7C-67.4,-33.6,-50.4,-39.8,-36.3,-47.9C-22.2,-56.1,-11.1,-66.3,3.1,-70.5C17.2,-74.7,34.5,-72.9,42.7,-62.9Z"
-              transform="translate(100 100)"
-            />
-          </svg>
-        </div>
-
-        <div class="columns mt-6">
-          <div class="column mr-6">
-            <h4 class="title">
-              What do you get <span class="has-text-warning"> ? </span>
-            </h4>
-            <p class="subtitle mt-3">
-              The service we provide allows you to lable your project/business
-              as KYC registered. With reglutary standard certificates to allow us to confirm
-              you're identity.
-              It doesnt matter if you're the developer, owner or team member. Here at People.ai
-              we can secure your identity and authenticate your position.
-              You can contact us for more information if needed.
-            </p>
-          </div>
-          <div class="column" data-aos="fade-left">
-            <img
-              class="image has-image-centered"
-              src="assets/img/feeling_happy.svg"
-              alt="feature1 img"
-              style="width: 20rem;"
-            />
-          </div>
-        </div>
-      </div>
-      <!-- single feature end (Left) -->
-
-      <!-- single feature start (Right) -->
-      <div class="single-feature">
-        <div class="shape-left" data-aos="fade-up-right">
-          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <path
-              fill="#9AAAE3"
-              d="M54.2,-67.2C69.4,-63.5,80.4,-46.6,84.6,-28.7C88.7,-10.8,86,8.1,76.8,21.4C67.6,34.7,51.9,42.3,38.1,50.3C24.2,58.3,12.1,66.7,-2.8,70.5C-17.7,74.3,-35.3,73.6,-45.6,64.5C-55.9,55.3,-58.8,37.7,-63.3,21.2C-67.7,4.7,-73.7,-10.6,-71.8,-25.4C-69.8,-40.2,-59.9,-54.5,-46.6,-58.9C-33.3,-63.2,-16.7,-57.6,1.4,-59.6C19.5,-61.5,39,-71,54.2,-67.2Z"
-              transform="translate(100 100)"
-            />
-          </svg>
-        </div>
-
-        <div class="columns mt-6">
-          <div class="column" data-aos="fade-right">
-            <img
-              class="image has-image-centered"
-              src="assets/img/music.svg"
-              alt="feature1 img"
-              style="width: 20rem;"
-            />
-          </div>
-          <div class="column">
-            <h4 class="title">Finding the next moonshot <span class="has-text-info"> ! </span></h4>
-            <p class="subtitle mt-3">
-              Using our service also gains you access to be broadcasted within our social media community.
-              Sharing your upcoming presale/project accross 190+ countries, Our community trust these projects
-              as the team have already verified their identity.
-              Join or follow our social media accounts for the latest updates in projects.
-            </p>
-          </div>
-        </div>
-      </div>
-      <!-- single feature end (Right) -->
-    </section>
-    <!-- Features Section End -->
-
-    <!-- Stats Section Start -->
-    <section id="payments" class="section mt-6">
-      <div class="has-text-centered">
-        <h1 class="title has-text-weight-bold">◇ Forms Of Payments ◇</h1>
-        <div class=""></div>
-      </div>
-      <div class="has-text-centered">
-        <h1 class="title has-text-weight-normal">There all types of crypto payments available to suit your application.</h1>
-        <div class=""></div>
-      </div>
-      <div class="mb-10"></div>
-      <img
-              class="image has-image-centered"
-              src="assets\img\crypto_logos.jpg"
-              alt="feature1 img"
-              style="width: 100rem;"
-            />
-        
-        </body>
-    </section>
-    <!-- Stats Section End -->
-
-    <!-- New Projects Section Starts -->
-    <section id="Projects" class="section mt-6">
-      <div class="has-text-centered">
-        <h1 class="title has-text-weight-bold">◆ New Onboard Projects ◆</h1>
-        <div class="line line-center blurple"></div>
-      </div>
-
-      <div class="columns mt-6">
-        <div class="column has-text-centered">
-          <p class="title has-text-weight-bold lined">JizzMoon</p>
-          <div class="mb-4"></div>
-          <span class="subtitle has-text-weight-bold blurple"><i class="fa-solid fa-check"></i>  KYC Approved</span>
-          <div class="mb-4"></div>
-          <img
-              class="image has-image-centered"
-              src="assets\img\jizzmoon.png"
-              alt="jizzmoon.png"
-              style="width: 10rem;"
-            />
-            <div class="mb-4"></div>
-            <a href="https://www.shibatoken.com/" class="button is-primary is-solid">
-            <strong><i class="fa-solid fa-webhook"></i> Check them out!</strong></a
-          >
-        </div>
-
-        <div class="column has-text-centered">
-          <p class="title has-text-weight-bold lined">Dixo</p>
-          <div class="mb-4"></div>
-          <span class="subtitle has-text-weight-bold blurple"><i class="fa-solid fa-check"></i>  KYC Approved</span>
-          <div class="mb-4"></div>
-          <img
-              class="image has-image-centered"
-              src="assets\img\dixo.png"
-              alt="dixo.png"
-              style="width: 10rem;"
-            />
-            <div class="mb-4"></div>
-            <a href="link here" class="button is-primary is-solid">
-            <strong><i class="fa-solid fa-webhook"></i> Check them out!</strong></a
-          >
-        </div>
-
-        <div class="column has-text-centered">
-          <p class="title has-text-weight-bold lined">GymLad</p>
-          <div class="mb-4"></div>
-          <span class="subtitle has-text-weight-bold blurple"><i class="fa-solid fa-check"></i>  KYC Approved</span>
-          <div class="mb-4"></div>
-          <img
-              class="image has-image-centered"
-              src="assets\img\gymlad.png"
-              alt="gymlad.png"
-              style="width: 11rem;"
-            />
-            <div class="mb-4"></div>
-            <a href="link here" class="button is-primary is-solid">
-            <strong><i class="fa-solid fa-webhook"></i> Check them out!</strong></a
-          >
-        </div>
-      </div>
-    </section>
-    <!-- New Projects Section Ends -->
-
-    <!-- Invite Section Start -->
-    <section class="section mt-6">
-      <div class="columns">
-        <div class="column has-text-left">
-          <p class="title has-text-weight-bold">
-            Ready to try <span class="blurple">People.ai</span>?
-          </p>
-          <p class="subtitle mt-3 has-text-gray">
-            Download our application form from the link below. A few simple steps to get full transparency within your project.
-            Once filled out you can email the form to our team. The lead time for verification is 24 hours. There is fast track options available upon request.
-          </p>
-          <a href="https://drive.google.com/uc?export=download&id=1gEsawjaL6xvJ-ssZ3AnynDKMLKQSOnrP" download="KYC Application Form 2023"
-            ><strong><i class="fa-solid fa-book"></i> Download KYC Application Form Here</strong></a
-          >
-        </div>
-
-        <div class="column"></div>
-      </div>
-    </section>
-    <!-- Invite Section End -->
-
-    <!-- Footer Section Start -->
-    <footer class="footer bg-base">
-      <div class="content has-text-centered has-text-white">
-        <div class="mb-4">
-          <a href="#" class="has-text-white" target="_blank">
-            <i class="fa-brands fa-telegram"></i>
-          </a>
-          &nbsp; &nbsp;
-          <a href="#" class="has-text-white" target="_blank">
-            <i class="fa-brands fa-twitter"></i>
-          </a>
-        </div>
-
-        
-
-        <p>
-          <span class="has-text-weight-bold">People.ai</span>
-          <br />
-          &copy; <span id="cp-year"></span> Copyright [People.ai]. All Rights
-          Reserved.
-        </p>
-
-        <p style="letter-spacing: 0.1em;" class="is-uppercase">
-          
-          <a
-            href="https://jstnlt.my.id"
-            class="blurple has-text-weight-bold"
-            target="_blank"
-            ></a
-          ><br> <a
-            href="https://github.com/JastinXyz/discord-bot-landing-page-web"
-            class="blurple has-text-weight-bold"
-            target="_blank"
-            ></a
-          >
-        </p>
-        
-      </div>
-    </footer>
-    <!-- Footer Section End -->
-
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://unpkg.com/@popperjs/core@2"></script>
-    <script src="https://unpkg.com/tippy.js@6"></script>
-    <script src="assets/js/script.js"></script>
-  </body>
+      console.log(result);
+    }
+  </script>
+</body>
 </html>
